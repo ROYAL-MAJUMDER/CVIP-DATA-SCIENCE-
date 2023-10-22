@@ -1,0 +1,56 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the terrorism dataset
+data = pd.read_csv
+# Basic Data Exploration
+# Display the first few rows of the dataset
+print(data.head())
+
+# Summary statistics
+print(data.describe())
+
+# Data Cleaning
+# Check for missing values
+print(data.isnull().sum())
+
+# Data Visualization
+# Plotting a bar chart of terrorist groups with the most attacks
+plt.figure(figsize=(10, 6))
+sns.countplot(data['gname'], order=data['gname'].value_counts().iloc[:10].index)
+plt.title('Top 10 Terrorist Groups with the Most Attacks')
+plt.xticks(rotation=90)
+plt.show()
+
+# Plotting a time series of terrorist attacks
+plt.figure(figsize=(12, 6))
+data['iyear'].value_counts().sort_index().plot(kind='line')
+plt.title('Number of Terrorist Attacks Over Time')
+plt.xlabel('Year')
+plt.ylabel('Number of Attacks')
+plt.show()
+
+# Geospatial Analysis
+# You may need geospatial libraries to create maps and analyze locations.
+
+# Attack type distribution
+plt.figure(figsize=(10, 6))
+sns.countplot(data['attacktype1_txt'], order=data['attacktype1_txt'].value_counts().index)
+plt.title('Distribution of Attack Types')
+plt.xticks(rotation=90)
+plt.show()
+
+# Region-wise analysis
+plt.figure(figsize=(10, 6))
+sns.countplot(data['region_txt'], order=data['region_txt'].value_counts().index)
+plt.title('Terrorist Attacks by Region')
+plt.xticks(rotation=90)
+plt.show()
+
+# Correlation Heatmap
+corr = data.corr()
+plt.figure(figsize=(12, 8))
+sns.heatmap(corr, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Heatmap')
+plt.show()
