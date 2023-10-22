@@ -1,0 +1,48 @@
+import numpy as np
+import pandas as pd
+import librosa
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load and preprocess the dataset (you can use your own dataset)
+# Example dataset: RAVDESS, https://zenodo.org/record/1188976
+data = pd.read_csv("path_to_emotion_dataset.csv")
+
+# Split the data into features (audio) and labels (emotions)
+X = []  # Audio features
+y = data['emotion']  # Emotion labels
+
+# Extract audio features using librosa (MFCCs, Chroma, Mel, etc.)
+for audio_file in data['file_path']:
+    audio, _ = librosa.load(audio_file, res_type='kaiser_fast', duration=2.5, offset=0.5)
+    mfccs = np.mean(librosa.feature.mfcc(y=audio, sr=_, n_mfcc=13), axis=1)
+    chroma = np.mean(librosa.feature.chroma_stft(y=audio, sr=_), axis=1)
+    mel = np.mean(librosa.feature.melspectrogram(y=audio, sr=_), axis=1)
+    spectral_contrast = np.mean(librosa.feature.spectral_contrast(y=audio, sr=_), axis=1)
+    features = np.hstack((mfccs, chroma, mel, spectral_contrast))
+    X.append(features)
+
+X = np.array(X)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a classifier (Random Forest is used as an example)
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+confusion = confusion_matrix(y_test, y_pred)
+report = classification_report(y_test, y_pred, target_names=data['emotion'].unique())
+
+# Print results
+print(f"Accuracy: {accuracy * 100:.2f}%")
+print("Confusion Matrix:")
+print(confusion)
+print("Classification Report:")
+print(report)
